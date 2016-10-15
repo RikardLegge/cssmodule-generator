@@ -1,8 +1,16 @@
+/**
+ * When using arrays with more than ~70 000 entries, some implementations of V8 are unable to properly optimize array.shift
+ * This custom implementation uses internal cursors to handle shifts, pushes and pops
+ *
+ * @param array target array to wrap
+ * @constructor
+ */
 export default function CheapArray(array) {
   this.array = array;
   this.startCursor = 0;
   this.endCursor = array.length;
 }
+
 CheapArray.prototype.shift = function shift() {
   if (this.isAtEnd()) {
     debugger;
@@ -13,27 +21,34 @@ CheapArray.prototype.shift = function shift() {
   this.startCursor++;
   return previous;
 };
+
 CheapArray.prototype.push = function push(item) {
   this.array[this.endCursor] = item;
   this.endCursor++;
 };
+
 CheapArray.prototype.pop = function pop() {
   var item = this.last();
   this.endCursor--;
   return item;
 };
+
 CheapArray.prototype.first = function current() {
   return this.array[this.startCursor];
 };
+
 CheapArray.prototype.last = function current() {
   return this.array[this.endCursor - 1];
 };
+
 CheapArray.prototype.isAtEnd = function isAtEnd() {
   return this.length() <= 0;
 };
+
 CheapArray.prototype.length = function length() {
   return this.endCursor - this.startCursor;
 };
+
 CheapArray.prototype.reverse = function reverse() {
   let length = this.length() / 2;
   let end = this.endCursor - 1;
@@ -43,9 +58,11 @@ CheapArray.prototype.reverse = function reverse() {
   }
   return this;
 };
+
 CheapArray.prototype.getArray = function getArray() {
   return this.array.slice(this.startCursor, this.endCursor);
 };
+
 CheapArray.prototype.get = function getArray(index) {
   return this.array[this.startCursor + index];
 };
