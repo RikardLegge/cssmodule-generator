@@ -1,0 +1,19 @@
+{
+  "name": "cssmodule-generator",
+  "version": "0.0.1",
+  "description": "A barebone and performant css module generator",
+  "main": "index.js",
+  "repository": {
+    "url": "https://github.com/RikardLegge/cssmodule-generator",
+    "type": "git"
+  },
+  "author": "Rikard Legge <rikard.legge@gmail.com>",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "babel-cli": "^6.16.0",
+    "babel-preset-es2015": "^6.16.0"
+  },
+  "dependencies": {
+    "string-hash": "^1.1.0"
+  }
+}
