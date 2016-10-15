@@ -6,6 +6,7 @@ import Timer from "./timer";
 const DefaultSubstitutionPattern = '{namespace}__{name}';
 const DefaultNamespace = '';
 const DefaultGeneratorName = 'es6';
+const DefaultJsonGeneration = false;
 
 export function generateUsingArgv(){
 
@@ -45,7 +46,10 @@ Try one of the following:\n${Object.keys(generators).join('\n')}`);
     return;
   }
 
-  generate(filePath, substitutionPattern, namespace, generator);
+  var json = process.argv[6] === 'true';
+  !json && console.error(`Not generating JSON`);
+
+  generate(filePath, substitutionPattern, namespace, generator, json, true, true);
 }
 
 function help(){
@@ -64,17 +68,18 @@ function getFilePathNoExtention(filePath){
   return filePathParts.join('.');
 }
 
-function generate(filePath, substitutionPattern, namespace, generator){
+function generate(filePath, substitutionPattern, namespace, generator, generateJSON, generateJs, generateCss){
   var rawCss = fs.readFileSync(filePath).toString();
   var filePathNoExt = getFilePathNoExtention(filePath);
 
   var timer = new Timer();
   var generated = modulizeCss(rawCss, {substitutionPattern, namespace, timers: timer.getTimers()});
-  var content = JSON.stringify(generated.substitutions);
+  var jsonContent = JSON.stringify(generated.substitutions);
+  var jsContent = JSON.stringify(Object.keys(generated.substitutions).reduce((subs, key)=>{subs[key] = generated.substitutions[key].join(' '); return subs;}, {}));
 
-  fs.writeFileSync(`${filePathNoExt}.css.json`, content);
-  fs.writeFileSync(`${filePathNoExt}.module.css`, generated.encodedCss);
-  fs.writeFileSync(`${filePathNoExt}.css.js`, generator(content, filePathNoExt));
+  generateCss && fs.writeFileSync(`${filePathNoExt}.module.css`, generated.encodedCss);
+  generateJs && fs.writeFileSync(`${filePathNoExt}.css.js`, generator(jsContent, filePathNoExt));
+  generateJSON && fs.writeFileSync(`${filePathNoExt}.css.json`, jsonContent);
 
   console.log(`Created files: ${filePathNoExt}{.css.json, .module.css, .css.js} in ${timer.getDuration()}ms`);
 }

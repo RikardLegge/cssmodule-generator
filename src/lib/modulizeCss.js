@@ -26,7 +26,8 @@ export default function modulizeCss(css, options={}) {
   var classes = parseCss(sourceCopy, {namespace, useHash});
   timers.parse = Date.now();
 
-  var substitutions = useHash ? generateClassNameSubstitutions(Object.keys(classes).map((key)=>classes[key]), substitutionPattern) : {};
+  var substitutions = {};
+  !useHash && generateClassNameSubstitutions(Object.keys(classes).map((key)=>classes[key]), substitutionPattern, substitutions);
   timers.generateClassSubstitutions = Date.now();
 
   var tokenList = Object.keys(classes).reduce((classList, className)=> { return classList.concat(classes[className]); }, []);
@@ -35,7 +36,7 @@ export default function modulizeCss(css, options={}) {
   tokenList.sort((a, b)=>b.start - a.start);
   timers.sortClassesByPosition = Date.now();
 
-  var cheapSource = replaceSelectors(source, tokenList, (node)=>substitutions[node.className] || generateSubstitution(node, substitutionPattern) );
+  var cheapSource = replaceSelectors(source, tokenList, (node)=>substitutions[node.className] || generateSubstitution(node, substitutionPattern, substitutions) );
   timers.replaceClassWithToken = Date.now();
 
   var target = cheapSource.getArray();
@@ -104,14 +105,14 @@ function replaceSelectors(source, bareTokenList, getSubstitution){
  *
  * @param tokens Token[]
  * @param substitutionPattern string
+ * @param substitutions {{string: string[]}}
  * @returns {{string: string}}
  */
-function generateClassNameSubstitutions(tokens, substitutionPattern) {
-  return tokens.reduce((classNameMap, tokenList)=> {
+function generateClassNameSubstitutions(tokens, substitutionPattern, substitutions) {
+  tokens.forEach((tokenList)=> {
     var token = tokenList[0];
-    classNameMap[token.className] = generateSubstitution(token, substitutionPattern);
-    return classNameMap;
-  }, {});
+    generateSubstitution(token, substitutionPattern, substitutions);
+  });
 }
 
 /**
@@ -119,10 +120,11 @@ function generateClassNameSubstitutions(tokens, substitutionPattern) {
  *
  * @param token Token
  * @param substitutionPattern string
+ * @param substitutions {{string: string[]}}
  * @returns {string}
  */
-function generateSubstitution(token, substitutionPattern) {
-  return substitutionPattern.replace(/{([^}]+)}/ig, (all, group)=> {
+function generateSubstitution(token, substitutionPattern, substitutions) {
+  var substitution = substitutionPattern.replace(/{([^}]+)}/ig, (all, group)=> {
     switch (group) {
       case 'namespace':
         return token.namespace;
@@ -136,4 +138,7 @@ function generateSubstitution(token, substitutionPattern) {
         return 'u' + (++uniqueCounter);
     }
   });
+
+  substitutions[token.className] = [];
+  substitutions[token.className].push(substitution);
 }
