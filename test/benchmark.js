@@ -9,6 +9,10 @@ var _modulizeCss = require('../lib/modulizeCss');
 
 var _modulizeCss2 = _interopRequireDefault(_modulizeCss);
 
+var _timer = require('../lib/timer');
+
+var _timer2 = _interopRequireDefault(_timer);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function benchmark(options) {
@@ -18,34 +22,21 @@ function benchmark(options) {
   var minify = !!options.minify || false;
   var entropy = options.entropy || 1;
 
+  var timer = new _timer2.default();
   var src = generateCss(itt, minifySrc, entropy);
   var substitutionPattern = minify ? '{unique}' : '{namespace}__{hash}__{name}';
-  var timers = {};
 
-  var localized = (0, _modulizeCss2.default)(src, { substitutionPattern: substitutionPattern, timers: timers });
-
-  var timerList = Object.keys(timers).map(function (name) {
-    return { name: name, time: timers[name] };
-  });
-  timerList.sort(function (a, b) {
-    return a.time - b.time;
-  });
-  var prevTime = timers.start;
-  var diff = timerList.reduce(function (diff, timer) {
-    var delta = timer.time - prevTime - 1;
-    delta = delta < 0 ? 0 : delta;
-    diff[timer.name] = delta;
-    prevTime = timer.time;
-    return diff;
-  }, {});
+  var localized = (0, _modulizeCss2.default)(src, { substitutionPattern: substitutionPattern, timers: timer.getTimers() });
 
   return {
     sourceCount: src.length,
     outputCount: localized.encodedCss.length,
+
     encodedCss: localized.encodedCss,
     substitutions: localized.substitutions,
-    timing: diff,
-    generationTime: timerList[timerList.length - 1].time - timerList[0].time
+
+    timing: timer.getRelativeTimers(),
+    generationTime: timer.getDuration()
   };
 }
 

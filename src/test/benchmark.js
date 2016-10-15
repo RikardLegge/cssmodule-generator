@@ -1,4 +1,5 @@
 import modulizeCss from '../lib/modulizeCss';
+import Timer from "../lib/timer";
 
 export default function benchmark(options) {
   options = options || {};
@@ -7,30 +8,21 @@ export default function benchmark(options) {
   var minify = !!options.minify || false;
   var entropy = options.entropy || 1;
 
+  var timer = new Timer();
   var src = generateCss(itt, minifySrc, entropy);
   var substitutionPattern = minify ? '{unique}' : '{namespace}__{hash}__{name}';
-  var timers = {};
 
-  var localized = modulizeCss(src, {substitutionPattern, timers});
-
-  var timerList = Object.keys(timers).map((name)=> {return {name, time: timers[name]}});
-  timerList.sort((a, b)=>a.time - b.time);
-  var prevTime = timers.start;
-  var diff = timerList.reduce((diff, timer)=> {
-    var delta = timer.time - prevTime - 1;
-    delta = delta < 0 ? 0 : delta;
-    diff[timer.name] = delta;
-    prevTime = timer.time;
-    return diff;
-  }, {});
+  var localized = modulizeCss(src, {substitutionPattern, timers: timer.getTimers()});
 
   return {
     sourceCount: src.length,
     outputCount: localized.encodedCss.length,
+
     encodedCss: localized.encodedCss,
     substitutions: localized.substitutions,
-    timing: diff,
-    generationTime: timerList[timerList.length - 1].time - timerList[0].time
+
+    timing: timer.getRelativeTimers(),
+    generationTime: timer.getDuration()
   }
 }
 

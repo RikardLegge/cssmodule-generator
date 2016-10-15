@@ -4,7 +4,7 @@
   "description": "A barebone and performant css module generator",
   "main": "index.js",
   "repository": {
-    "url": "https://github.com/RikardLegge/cssmodule-generator",
+    "url": "https://github.com/RikardLegge/cssmodule-generator.git",
     "type": "git"
   },
   "author": "Rikard Legge <rikard.legge@gmail.com>",
@@ -15,5 +15,8 @@
   },
   "dependencies": {
     "string-hash": "^1.1.0"
+  },
+  "bin": {
+    "css-modulegenerator": "./bin/cssmodule-generator.sh",
   }
 }
