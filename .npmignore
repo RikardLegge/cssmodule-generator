@@ -3,3 +3,6 @@ node_modules
 /.babelrc
 /test
 /demo-data
+
+/bin/build-demo.sh
+/bin/benchmark.sh

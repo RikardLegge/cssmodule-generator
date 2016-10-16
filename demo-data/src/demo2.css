@@ -1,0 +1,18 @@
+.modal {
+    position: absolute;
+    right: 100px;
+    bottom: 100px;
+}
+
+.container {
+    padding: 20px;
+    background: forestgreen;
+}
+
+.button {
+    padding: 40px;
+    margin: 20px;
+    border: 8px solid darkgreen;
+    background: lawngreen;
+    color: black;
+}

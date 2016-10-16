@@ -1,0 +1,19 @@
+.modal {
+    position: absolute;
+    left: 100px;
+    bottom: 100px;
+}
+
+.container {
+    padding: 40px;
+    background: black;
+}
+
+.button {
+    padding: 40px;
+    border-radius: 5px;
+    border: 2px solid darkgray;
+    background: gray;
+    color: orange;
+    cursor: pointer;
+}

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-FILEPATH=$(pwd)/$1
+WORKINGDIRECTORY="$(pwd)"
 cd "$(dirname "$0")"
 
-node ../index.js "$FILEPATH" $2 $3
+node ../index.js --workningDirectory="$WORKINGDIRECTORY" $@

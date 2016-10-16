@@ -141,4 +141,5 @@ function generateSubstitution(token, substitutionPattern, substitutions) {
 
   substitutions[token.className] = [];
   substitutions[token.className].push(substitution);
+  return substitution;
 }
